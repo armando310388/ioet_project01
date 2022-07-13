@@ -5,7 +5,8 @@ def validate_data(single_data: str) -> bool:
 
 def extract_data_day(single_data: str) -> list:
     """Method for extracting each single day data from a single data from a employee"""
-    pass
+    string_with_hours = single_data.split('=')[1]
+    return string_with_hours.split(',')
 
 
 def convert_data_day_to_list(single_data: str) -> list:
