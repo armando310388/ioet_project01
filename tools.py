@@ -1,6 +1,16 @@
-def validate_data(single_data: str) -> bool:
+import re
+
+from exceptions import DataStructureError
+
+
+def validate_data(single_data: str, line_number: int) -> None:
     """Method for validating a given single data from a employee"""
-    pass
+    matched = re.fullmatch(
+        '\w+=((MO|TU|WE|TH|FR|SA|SU)\d{2}:\d{2}-\d{2}:\d{2},)*(MO|TU|WE|TH|FR|SA|SU)\d{2}:\d{2}-\d{2}:\d{2}',
+        single_data
+    )
+    if not matched:
+        raise DataStructureError(line_number)
 
 
 def extract_data_day(single_data: str) -> list:
