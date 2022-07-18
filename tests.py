@@ -1,5 +1,6 @@
 import unittest
-from tools import SingleEmployeeData, DataAnalyzer
+from unittest.mock import patch
+from tools import SingleEmployeeData
 from exceptions import DataStructureError, DuplicatedDayError, InvalidHourError, LimitHourError
 
 
@@ -24,17 +25,24 @@ class TestTools(unittest.TestCase):
         single_data = 'RENE=MO10:00-12:00,TU10:00-12:00,TH01:00-03:00,SA14:00-18:00,SU20:00-21:00'
         single_data_line_number = 2
         employee_data = SingleEmployeeData(single_data, single_data_line_number)
-        employee_name, employee_hours = employee_data.extract_hours_and_name()
+        employee_name, employee_hours = employee_data._extract_hours_and_name()
         expected_employee_hours = ['MO10:00-12:00', 'TU10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00']
         self.assertEqual(employee_name, 'RENE')
         self.assertEqual(employee_hours, expected_employee_hours)
 
-    def test_extract_limit_hours_and_days(self):
-        single_data = ['MO10:00-12:00', 'TU10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00']
-        single_data_line_number = 2
+    @patch('tools.SingleEmployeeData.__init__')
+    def test_extract_limit_hours_and_days(self, mock_single_employee_data):
         expected_result = self.employee_hours
-        analyzer = DataAnalyzer(single_data_line_number)
-        result = analyzer.limit_hours_and_days(single_data)
+
+        mock_single_employee_data.return_value = None
+        employee_data = 'some_data'
+        single_employee_data = SingleEmployeeData(employee_data)
+        single_employee_data.employee_hours = [
+            'MO10:00-12:00', 'TU10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00'
+        ]
+        single_employee_data.line_number = 2
+
+        result = single_employee_data._limit_hours_and_days()
         self.assertEqual(result, expected_result)
 
     def test_validate_data_hour_not_rounded(self):
@@ -45,13 +53,18 @@ class TestTools(unittest.TestCase):
             single_employee_data = SingleEmployeeData(single_data, single_data_line_number)
         self.assertEqual(context.exception.msg, 'Data does not have the specified structure.')
 
-    def test_validate_data_duplicated_day(self):
-        single_data = ['MO10:00-12:00', 'MO10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00']
-        single_data_line_number = 2
+    @patch('tools.SingleEmployeeData.__init__')
+    def test_validate_data_duplicated_day(self, mock_single_employee_data):
+        mock_single_employee_data.return_value = None
+        employee_data = 'some_data'
+        single_employee_data = SingleEmployeeData(employee_data)
+        single_employee_data.employee_hours = [
+            'MO10:00-12:00', 'MO10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00'
+        ]
+        single_employee_data.line_number = 2
 
         with self.assertRaises(DuplicatedDayError) as context:
-            analyzer = DataAnalyzer(single_data_line_number)
-            result = analyzer.limit_hours_and_days(single_data)
+            result = single_employee_data._limit_hours_and_days()
         self.assertEqual(context.exception.msg, 'Data in line 2 has a duplicated day.')
 
     def test_validate_data_bad_day(self):
@@ -102,40 +115,61 @@ class TestTools(unittest.TestCase):
             single_employee_data = SingleEmployeeData(single_data, single_data_line_number)
         self.assertEqual(context.exception.msg, 'Data does not have the specified structure.')
 
-    def test_validate_data_bad_hour(self):
-        single_data = ['MO10:00-25:00', 'TU10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00']
-        single_data_line_number = 2
+    @patch('tools.SingleEmployeeData.__init__')
+    def test_validate_data_bad_hour(self, mock_single_employee_data):
+        mock_single_employee_data.return_value = None
+        employee_data = 'some_data'
+        single_employee_data = SingleEmployeeData(employee_data)
+        single_employee_data.employee_hours = [
+            'MO10:00-25:00', 'MO10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-21:00'
+        ]
+        single_employee_data.line_number = 2
 
         with self.assertRaises(InvalidHourError) as context:
-            analyzer = DataAnalyzer(single_data_line_number)
-            result = analyzer.limit_hours_and_days(single_data)
+            result = single_employee_data._limit_hours_and_days()
         self.assertEqual(context.exception.msg, 'Data in line 2 has an invalid hour.')
 
-    def test_validate_data_bad_limits(self):
-        single_data = ['MO10:00-12:00', 'TU10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-11:00']
-        single_data_line_number = 2
+    @patch('tools.SingleEmployeeData.__init__')
+    def test_validate_data_bad_limits(self, mock_single_employee_data):
+        mock_single_employee_data.return_value = None
+        employee_data = 'some_data'
+        single_employee_data = SingleEmployeeData(employee_data)
+        single_employee_data.employee_hours = [
+            'MO10:00-12:00', 'TU10:00-12:00', 'TH01:00-03:00', 'SA14:00-18:00', 'SU20:00-11:00'
+        ]
+        single_employee_data.line_number = 2
 
         with self.assertRaises(LimitHourError) as context:
-            analyzer = DataAnalyzer(single_data_line_number)
-            result = analyzer.limit_hours_and_days(single_data)
+            result = single_employee_data._limit_hours_and_days()
         self.assertEqual(
             context.exception.msg,
             'Data in line 2 has an invalid limit hour. Start hour must be less than the end hour.'
         )
 
-    def test_convert_data_day_to_list(self):
-        single_data = self.employee_hours
-        single_data_line_number = 2
+    @patch('tools.SingleEmployeeData.__init__')
+    @patch('tools.SingleEmployeeData._limit_hours_and_days')
+    def test_convert_data_day_to_list(self, mock_limit_hours_and_days, mock_single_employee_data):
         expected_result = self.full_day_hours
-        analyzer = DataAnalyzer(single_data_line_number)
-        result = analyzer.hours_lists(single_data)
+
+        mock_single_employee_data.return_value = None
+        employee_data = 'some_data'
+        single_employee_data = SingleEmployeeData(employee_data)
+
+        mock_limit_hours_and_days.return_value = self.employee_hours
+
+        result = single_employee_data._hours_lists()
         self.assertEqual(result, expected_result)
 
-    def test_calculate_amount(self):
-        single_data = self.full_day_hours
-        single_data_line_number = 2
-        analyzer = DataAnalyzer(single_data_line_number)
-        result = analyzer.calculate_amount(single_data)
+    @patch('tools.SingleEmployeeData.__init__')
+    @patch('tools.SingleEmployeeData._hours_lists')
+    def test_calculate_amount(self, mock_hours_lists, mock_single_employee_data):
+        mock_single_employee_data.return_value = None
+        employee_data = 'some_data'
+        single_employee_data = SingleEmployeeData(employee_data)
+
+        mock_hours_lists.return_value = self.full_day_hours
+
+        result = single_employee_data.calculate_amount()
         self.assertEqual(result, 215)
 
 
