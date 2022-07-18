@@ -9,7 +9,7 @@ from main import full_calculate_payment
 
 
 class TestTools(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.employee_hours = {
             'MO': [10, 12],
             'TU': [10, 12],
@@ -178,12 +178,12 @@ class TestTools(unittest.TestCase):
 
 
 class TestIntegration(unittest.TestCase):
-    def setUp(self) -> None:
+    def setUp(self):
         self.main_folder = os.path.dirname(os.path.abspath(__file__))
         self.data_without_error = self.main_folder + '/fixtures/full_correct_data.txt'
         self.data_with_error = self.main_folder + '/fixtures/full_not_correct_data.txt'
 
-    def test_calculate_payment(self) -> None:
+    def test_calculate_payment(self):
         expected_result = 'The amount to pay RENE is: 215 USD\n' \
                           'The amount to pay CARL is: 170 USD\n' \
                           'The amount to pay JULIO is: 110 USD\n' \

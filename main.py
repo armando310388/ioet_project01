@@ -3,6 +3,7 @@ from tools import SingleEmployeeData
 
 
 def full_calculate_payment(data_path: str) -> None:
+    """Method for calculating all the payment values for the employees in a file"""
     line_number = 0
     employees_names = set()
     try:

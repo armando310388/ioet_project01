@@ -31,7 +31,7 @@ class SingleEmployeeData:
         self.line_number = line_number
         self.employee_name, self.employee_hours = self._extract_hours_and_name()
 
-    def _extract_hours_and_name(self):
+    def _extract_hours_and_name(self) -> (str, list):
         employee_name_and_hours = self.single_data.split('=')
         employee_name = employee_name_and_hours[0]
         string_with_hours = employee_name_and_hours[1]
