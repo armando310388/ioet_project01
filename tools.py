@@ -12,7 +12,7 @@ class SingleData:
     def __set__(self, instance, value):
         """Method which validates the data of an employee"""
         general_matched = re.fullmatch(
-            '[a-zA-Z]+=((MO|TU|WE|TH|FR|SA|SU)\d{2}:00-\d{2}:00,)*(MO|TU|WE|TH|FR|SA|SU)\d{2}:00-\d{2}:00',
+            '[a-zA-Z]+=((MO|TU|WE|TH|FR|SA|SU)\d{2}:00-\d{2}:00,)*(MO|TU|WE|TH|FR|SA|SU)\d{2}:00-\d{2}:00\n?',
             value
         )
 
@@ -29,9 +29,9 @@ class SingleEmployeeData:
     def __init__(self, single_data: str, line_number: int) -> None:
         self.single_data = single_data
         self.line_number = line_number
-        self.employee_name, self.employee_hours = self.extract_hours_and_name()
+        self.employee_name, self.employee_hours = self._extract_hours_and_name()
 
-    def extract_hours_and_name(self):
+    def _extract_hours_and_name(self):
         employee_name_and_hours = self.single_data.split('=')
         employee_name = employee_name_and_hours[0]
         string_with_hours = employee_name_and_hours[1]
@@ -39,16 +39,10 @@ class SingleEmployeeData:
 
         return employee_name, employee_hours
 
-
-class DataAnalyzer:
-    """Class for manage the data analyzer for a single employee data"""
-    def __init__(self, line_number: int) -> None:
-        self.line_number = line_number
-
-    def limit_hours_and_days(self, employee_hours: list) -> dict:
+    def _limit_hours_and_days(self) -> dict:
         """Method for converting the 'XXHH:MM-HH:MM' list from a employee to a XX: [initial, end] dictionary"""
         result = {}
-        for day_data in employee_hours:
+        for day_data in self.employee_hours:
             day = day_data[:2]
             if day in result:
                 raise DuplicatedDayError(self.line_number)
@@ -62,20 +56,20 @@ class DataAnalyzer:
                 raise InvalidHourError(self.line_number)
         return result
 
-    @staticmethod
-    def hours_lists(employee_hours: dict) -> dict:
+    def _hours_lists(self) -> dict:
         """Method for converting the [initial, end] data from a employee to full 24 hours lists"""
         result = {}
-        days_limits = employee_hours
+        days_limits = self._limit_hours_and_days()
         for day in days_limits:
             initial_hour = days_limits[day][0]
             end_hour = days_limits[day][1]
             result[day] = [1 if initial_hour <= i < end_hour else 0 for i in range(24)]
         return result
 
-    @staticmethod
-    def calculate_amount(full_day_employee_hours: dict) -> int:
+    def calculate_amount(self) -> int:
         """Method for calculating the amount to pay for a employee"""
+        full_day_employee_hours = self._hours_lists()
+
         payment_per_hour = {
             'MO': [25, 25, 25, 25, 25, 25, 25, 25, 25, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20, 20],
             'TU': [25, 25, 25, 25, 25, 25, 25, 25, 25, 15, 15, 15, 15, 15, 15, 15, 15, 15, 20, 20, 20, 20, 20, 20],
