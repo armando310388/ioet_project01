@@ -1,7 +1,11 @@
 import unittest
+import os
+import io
+import sys
 from unittest.mock import patch
 from tools import SingleEmployeeData
 from exceptions import DataStructureError, DuplicatedDayError, InvalidHourError, LimitHourError
+from main import full_calculate_payment
 
 
 class TestTools(unittest.TestCase):
@@ -171,6 +175,39 @@ class TestTools(unittest.TestCase):
 
         result = single_employee_data.calculate_amount()
         self.assertEqual(result, 215)
+
+
+class TestIntegration(unittest.TestCase):
+    def setUp(self) -> None:
+        self.main_folder = os.path.dirname(os.path.abspath(__file__))
+        self.data_without_error = self.main_folder + '/fixtures/full_correct_data.txt'
+        self.data_with_error = self.main_folder + '/fixtures/full_not_correct_data.txt'
+
+    def test_calculate_payment(self) -> None:
+        expected_result = 'The amount to pay RENE is: 215 USD\n' \
+                          'The amount to pay CARL is: 170 USD\n' \
+                          'The amount to pay JULIO is: 110 USD\n' \
+                          'The amount to pay ARMANDO is: 415 USD\n' \
+                          'The amount to pay JOSE is: 165 USD\n' \
+                          'The amount to pay IVAN is: 105 USD\n' \
+                          'The amount to pay JORGE is: 185 USD\n'
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        full_calculate_payment(self.data_without_error)
+        sys.stdout = sys.__stdout__
+        self.assertEqual(captured_output.getvalue(), expected_result)
+
+    def test_calculate_payment_error(self):
+        expected_result = 'The amount to pay RENE is: 215 USD\n' \
+                          'The amount to pay CARL is: 170 USD\n' \
+                          'The amount to pay JULIO is: 110 USD\n'
+
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        with self.assertRaises(InvalidHourError) as context:
+            full_calculate_payment(self.data_with_error)
+        sys.stdout = sys.__stdout__
+        self.assertEqual(captured_output.getvalue(), expected_result)
 
 
 if __name__ == '__main__':
