@@ -6,8 +6,8 @@ class DataStructureError(Exception):
         line_number -- Line number of the file where the error was found
     """
 
-    def __init__(self, line_number):
-        self.msg = f'Data in line {line_number} does not have the specified structure.'
+    def __init__(self):
+        self.msg = f'Data does not have the specified structure.'
 
     def __str__(self):
         return self.msg
