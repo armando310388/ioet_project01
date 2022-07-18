@@ -1,3 +1,4 @@
+import sys
 from tools import SingleEmployeeData
 
 
@@ -22,5 +23,7 @@ def full_calculate_payment(data_path: str) -> None:
 
 
 if __name__ == '__main__':
+    sys.tracebacklimit = 0
+
     file_path = input('Enter data file path: ')
     full_calculate_payment(file_path)
