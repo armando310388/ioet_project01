@@ -111,7 +111,41 @@ they're going to be encapsulated in the method `main.full_calculate_payment`. If
 passes all the validations then we're going to store the message in the variable `result` defined in 
 `main.full_calculate_payment`.
 
+The core of the payment calculation are two processes:
+1. Convert the schedule given in a string, to a data structure that could provide an easy approach for making the
+calculation.
+2. Convert the payment information given as two tables in the exercise statement, to the same data structure named in 
+the previous item in order to make an easy approach for calculate the payment.
 
+A data structure that could help us in both items is a matrix, but we can't use an external package such as numpy in
+order to make some calculations, so let's change it to something similar, a dictionary where we have keys and data 
+linked to each of them, and appears very natural to think the week-days as the keys, and we can provide a list of 
+numbers for each week-day which represents two kind of values. Now let's define what are going to be those values.
+
+In order to define what are going to represent the values in the list for a week-day, let's analyze a formula which can
+help us to calculate an employee payment, the first way that I could imagine was to analyze how many hours in each block
+of hours for each day, has the employee, but the problem is that I could get so many conditionals because we have six
+blocks of costs given in the table which was provided in the exercise statement, but we can make a different approach
+using an idea coming from matrix product operation, the idea is to define a list with 24 values, where the value in the 
+position 0 represents the cost of working from 00:01 to 01:00, the value in the position 1 represents the cost of 
+working from 01:01 to 02:00, in general, the value in the position __n__ represents the cost of working from n:01 to
+n+1:00. This is an approach for converting the payment information given as two tables in the exercise statement, to a 
+data structure that could provide an easy approach for making the calculation, in this path is, a dictionary with lists.
+
+So the final step is to go through each value of the list for each day and check if the analyzed hour belongs to
+the employee schedule, if so then we need to add the cost of that hour to the total payment. But we have another way to 
+accomplish this algorithm without using conditions, and it's by using the following formula:
+
+![Total payment formula](images/ioet_formula.png)
+
+In the previous formula we have a 0 and 1 value, they're representing the condition, 1 if the hour belongs to the 
+employee schedule and 0 if it doesn't belong to the employee schedule, so it's generating the required algorithm because
+it's only adding the hour cost for the hours that belongs to the employee schedule.
+
+Finally, the step that we're needing is to generate a list with 24 values, where the value in the 
+position 0 says if the employee worked from 00:01 to 01:00, the value in the position 1 says if the employee worked from
+01:01 to 02:00, in general, the value in the position __n__ says if the employee worked from n:01 to n+1:00. This is a 
+way to convert the schedule given for an employee as a string, to a dictionary with lists.
 
 
 # How to run the program locally
