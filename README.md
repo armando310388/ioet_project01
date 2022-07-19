@@ -80,8 +80,38 @@ employee.
 6. In order to prevent a conflict with the financial department and the employees, we're going to consider that each
 daily schedule is going to start at the time x hours : 0 minutes and is going to finish at the time y hours : 0 minutes.
 In order to work with times which doesn't have 0 minutes, we need a round clarification from the financial department.
+7. We need to check that there isn't an employee data with an hour greater than 23:00, because it doesn't exists.
+8. And finally we need to check that the start time is less than the finish time.
 
+### Exceptions:
+
+Let's go deeply in some conditions trying to raise an exception when a condition check has not passed, so we can work 
+with custom exceptions and messages:
+- `FileTypeError`: Exception raised when the file is not a txt file.
+- If the given file has less than 5 sets of data, then we're going to see a custom message "The file must have at least 
+five sets of data."
+- `DataStructureError`: Exception raised for errors when single data does not have the structure given in the exercise 
+statement.
+- If the given file has a duplicated employee name, then we're going to see a custom message "Error: The employee XYZ 
+appears more than once."
+- `DuplicatedDayError`: Exception raised for errors when single data contains a duplicated day.
+- `InvalidHourError`: Exception raised for errors when single data contains an invalid hour.
+- `LimitHourError`: Exception raised for errors when single data contains an invalid limit hour.
+
+One way to accomplish the __Milestones__ considering the __Conditions__ and __Exceptions__ is by using a process like 
+the following:
 ![Process diagram](images/ioet_design.png)
+
+First of all I created a method for analyzing if a path corresponds to a txt file (`main.check_file`), if the path 
+doesn't correspond to a txt file then `FileTypeError` is going to be raised, but if it's a txt file, then we can proceed 
+to the payment calculation by reading the given file.
+
+In this step we're going to read each line and analyzing each of them considering the __Conditions__ and __Exceptions__,
+they're going to be encapsulated in the method `main.full_calculate_payment`. If a data line (single employee data) 
+passes all the validations then we're going to store the message in the variable `result` defined in 
+`main.full_calculate_payment`.
+
+
 
 
 # How to run the program locally
