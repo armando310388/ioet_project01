@@ -1,3 +1,15 @@
+class FileTypeError(Exception):
+    """
+    Exception raised when the file is not a txt file
+    """
+
+    def __init__(self):
+        self.msg = 'The file must be a txt file.'
+
+    def __str__(self):
+        return self.msg
+
+
 class DataStructureError(Exception):
     """
     Exception raised for errors when single data does not have the specified structure
@@ -7,7 +19,7 @@ class DataStructureError(Exception):
     """
 
     def __init__(self):
-        self.msg = f'Data does not have the specified structure.'
+        self.msg = 'Data does not have the specified structure.'
 
     def __str__(self):
         return self.msg
