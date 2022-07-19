@@ -5,7 +5,7 @@ import sys
 from unittest.mock import patch
 from tools import SingleEmployeeData
 from exceptions import DataStructureError, DuplicatedDayError, InvalidHourError, LimitHourError
-from main import full_calculate_payment
+from main import check_file, full_calculate_payment
 
 
 class TestTools(unittest.TestCase):
@@ -24,6 +24,16 @@ class TestTools(unittest.TestCase):
             'SA': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0],
             'SU': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0]
         }
+
+    def test_check_file_txt(self):
+        file_path = 'some_folder/some_file.txt'
+        result = check_file(file_path)
+        self.assertTrue(result)
+
+    def test_check_file_not_txt(self):
+        file_path = 'some_folder/some_file.png'
+        result = check_file(file_path)
+        self.assertFalse(result)
 
     def test_extract_hours_and_name(self):
         single_data = 'RENE=MO10:00-12:00,TU10:00-12:00,TH01:00-03:00,SA14:00-18:00,SU20:00-21:00'
@@ -180,8 +190,18 @@ class TestTools(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     def setUp(self):
         self.main_folder = os.path.dirname(os.path.abspath(__file__))
+        self.data_not_found = self.main_folder + '/fixtures/some_inexistent_file.txt'
         self.data_without_error = self.main_folder + '/fixtures/full_correct_data.txt'
+        self.data_less_than_minimun = self.main_folder + '/fixtures/full_incomplete_correct_data.txt'
         self.data_with_error = self.main_folder + '/fixtures/full_not_correct_data.txt'
+
+    def test_data_not_found(self):
+        expected_result = "Error: The file wasn't found.\n"
+        captured_output = io.StringIO()
+        sys.stdout = captured_output
+        full_calculate_payment(self.data_not_found)
+        sys.stdout = sys.__stdout__
+        self.assertEqual(captured_output.getvalue(), expected_result)
 
     def test_calculate_payment(self):
         expected_result = 'The amount to pay RENE is: 215 USD\n' \
@@ -190,24 +210,24 @@ class TestIntegration(unittest.TestCase):
                           'The amount to pay ARMANDO is: 415 USD\n' \
                           'The amount to pay JOSE is: 165 USD\n' \
                           'The amount to pay IVAN is: 105 USD\n' \
-                          'The amount to pay JORGE is: 185 USD\n'
+                          'The amount to pay JORGE is: 185 USD\n\n'
         captured_output = io.StringIO()
         sys.stdout = captured_output
         full_calculate_payment(self.data_without_error)
         sys.stdout = sys.__stdout__
         self.assertEqual(captured_output.getvalue(), expected_result)
 
-    def test_calculate_payment_error(self):
-        expected_result = 'The amount to pay RENE is: 215 USD\n' \
-                          'The amount to pay CARL is: 170 USD\n' \
-                          'The amount to pay JULIO is: 110 USD\n'
-
+    def test_calculate_payment_less_than_minimun_data(self):
+        expected_result = 'The file must have at least five sets of data.\n'
         captured_output = io.StringIO()
         sys.stdout = captured_output
-        with self.assertRaises(InvalidHourError) as context:
-            full_calculate_payment(self.data_with_error)
+        full_calculate_payment(self.data_less_than_minimun)
         sys.stdout = sys.__stdout__
         self.assertEqual(captured_output.getvalue(), expected_result)
+
+    def test_calculate_payment_error(self):
+        with self.assertRaises(InvalidHourError) as context:
+            full_calculate_payment(self.data_with_error)
 
 
 if __name__ == '__main__':
