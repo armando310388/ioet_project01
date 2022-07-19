@@ -147,6 +147,19 @@ position 0 says if the employee worked from 00:01 to 01:00, the value in the pos
 01:01 to 02:00, in general, the value in the position __n__ says if the employee worked from n:01 to n+1:00. This is a 
 way to convert the schedule given for an employee as a string, to a dictionary with lists.
 
+There are some updates that can be made to the actual code in order to increase the app potentiality, some of them are:
+- Analyze how many minutes of an hour belongs to a employee schedule, and pass it as a fraction to the list which 
+represents if an employee work in a specific hour, so instead of setting 0 or 1 for a single value in the list, we're 
+going to set a fraction between 0 and 1 (including 0 and 1), for example the fraction 7/60 represents that the 
+employee worked 7 minutes of this hour for that particular day, so we can receive employee schedule with hours like
+02:32-03:48, but a possible issue is that we need to know if the rounding process must be done when calculating how much
+a employee must receive for a particular hour, or block, or day, or if the rounding process must be done at the last
+result, just before showing the amount in screen. This needs to be analyzed by the financial department.
+- Let an employee data to have a duplicated week-day, for example RENE=MO10:00-11:00,MO13:00-14:00, this could help an
+employee to pass a schedule with a break for some days, it's not difficult to add this case in the code because we only
+need to prevent duplicated hours (if we have this case) being counted more than once when generating the dictionary with
+lists.  
+
 
 # How to run the program locally
 
