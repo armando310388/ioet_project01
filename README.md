@@ -81,7 +81,7 @@ employee.
 daily schedule is going to start at the time x hours : 0 minutes and is going to finish at the time y hours : 0 minutes.
 In order to work with times which doesn't have 0 minutes, we need a round clarification from the financial department.
 
-![Process diagram](https://drive.google.com/file/d/1TT3CxlWA1NMQyU6GomdceLUSohu_UPxB)
+![Process diagram](images/ioet_design.png)
 
 
 # How to run the program locally
